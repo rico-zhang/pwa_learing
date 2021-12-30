@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pwa</title>
+    <link rel="manifest" href="./manifest.json">
+</head>
+
+<body>
+    <h1>
+        pwa-app
+    </h1>
+    <h1 id="data">
+
+    </h1>
+    <script>
+        window.addEventListener('load', async () => {
+            if (window.navigator.serviceWorker) {
+                try {
+                    const res = await navigator.serviceWorker.register('/sw.js',)
+                    console.log(res);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        })
+
+        if (Notification.permission == "default") {
+            Notification.requestPermission();
+        }
+        if (!navigator.onLine) {
+            new Notification('提示', {
+                body: '网络已断开，您现在访问的是离线内容'
+            })
+        }
+        window.addEventListener('online', () => {
+            new Notification('提示', {
+                body: '网络已恢复,请刷新获取联网数据'
+            });
+        })
+        window.addEventListener('offline', () => {
+            new Notification('提示', {
+                body: '网络已断开，您现在访问的是离线内容'
+            })
+        })
+    </script>
+    <script>
+        const dataDom = document.getElementById('data');
+        fetch('/api/getMovies', {
+            method: 'GET',
+        }).then(res => res.json())
+            .then(data => {
+                console.log(data);
+                dataDom.innerText = JSON.stringify(data)
+            })
+    </script>
+
+    <!-- <script>
+
+        //1、创建ajax对象
+        var xhr = null;
+        try {
+            xhr = new XMLHttpRequest();
+        } catch (error) {
+            xhr = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        //2、等待数据响应
+        //必须在调用open()方法之前指定onreadystatechange事件处理程序才能确保跨域浏览器兼容性                //问题
+        //只要readyState属性的值有变化，就会触发readystatechange事件
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                //判断本次下载的状态码都是多少 304表示请求的资源没有被修改
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                    alert(xhr.responseText);
+                } else {
+                    alert("Error:" + xhr.status);
+                }
+            }
+        }
+        //3、调用open
+
+        xhr.open("get", "/api/getMovies", true);
+
+        //4、调用send
+        xhr.send();
+    </script> -->
+</body>
+
+</html>
